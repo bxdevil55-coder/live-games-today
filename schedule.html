@@ -3,8 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Match Schedule | Live Games Today</title>
+<meta name="description" content="View sports match scores and match status on Live Games Today.">
+<title>Live Scores | Live Games Today</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.controls { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0; }
+select, .refresh {
+  padding:11px 14px; border-radius:8px; border:1px solid #35425a;
+  background:#111827; color:#fff; font-size:16px;
+}
+.refresh { background:#00f5d4; color:#071014; font-weight:bold; }
+.match { background:#111827; border:1px solid #273248; border-radius:14px;
+  padding:18px; margin-bottom:14px; }
+.match-top { display:flex; justify-content:space-between; gap:12px;
+  color:#a5b0c5; font-size:13px; margin-bottom:12px; }
+.teamrow { display:flex; justify-content:space-between; align-items:center;
+  gap:12px; padding:7px 0; font-weight:bold; }
+.score { color:#00f5d4; font-size:21px; min-width:35px; text-align:right; }
+#message { color:#a5b0c5; padding:12px 0; }
+.attribution { margin-top:24px; font-size:13px; }
+.attribution a { color:#00f5d4; }
+</style>
 </head>
 <body>
 <header>
@@ -17,28 +36,123 @@
 <a href="contact.html">Contact</a>
 </nav>
 </header>
+
 <main>
 <section class="hero">
-<h1>Match <span>Schedule</span></h1>
-<p class="muted">Check match listings and plan what to watch.</p>
+<h1>Live <span>Scores</span></h1>
+<p class="muted">Match scores and status from a sports data API.</p>
 </section>
-<div class="card">
-<h3>⚽ Football — Example Fixture</h3>
-<p>Team A vs Team B</p>
-<p class="muted">Date: To be confirmed · Time: To be confirmed</p>
+
+<div class="controls">
+<select id="sport" aria-label="Choose sport">
+<option value="football">⚽ Football</option>
+<option value="cricket">🏏 Cricket</option>
+<option value="basketball">🏀 Basketball</option>
+<option value="tennis">🎾 Tennis</option>
+</select>
+<button class="refresh" id="refresh">Refresh scores</button>
 </div>
-<div class="card">
-<h3>🏏 Cricket — Example Fixture</h3>
-<p>Team C vs Team D</p>
-<p class="muted">Date: To be confirmed · Time: To be confirmed</p>
-</div>
-<div class="card">
-<h3>🏀 Basketball — Example Fixture</h3>
-<p>Team E vs Team F</p>
-<p class="muted">Date: To be confirmed · Time: To be confirmed</p>
-</div>
-<p class="muted">These are demonstration listings only, not confirmed upcoming matches. Real schedules require a reliable sports data source.</p>
+
+<p id="message" role="status">Loading scores...</p>
+<section id="matches" aria-live="polite"></section>
+
+<p class="attribution">
+Sports data provided by
+<a href="https://sportscore.com/" rel="dofollow" target="_blank">SportScore</a>.
+Data availability and update frequency depend on the provider.
+</p>
 </main>
+
 <footer>© 2026 Live Games Today</footer>
+
+<script>
+const sportSelect = document.getElementById("sport");
+const matchesEl = document.getElementById("matches");
+const messageEl = document.getElementById("message");
+const refreshBtn = document.getElementById("refresh");
+
+function safeText(value, fallback = "TBD") {
+  return typeof value === "string" || typeof value === "number"
+    ? String(value) : fallback;
+}
+
+function makeMatch(match) {
+  const card = document.createElement("article");
+  card.className = "match";
+
+  const top = document.createElement("div");
+  top.className = "match-top";
+
+  const status = safeText(match.status_text || match.status, "Status unavailable");
+  const time = match.time ? new Date(match.time) : null;
+  const validTime = time && !Number.isNaN(time.getTime());
+
+  top.textContent = status + (validTime ? " · " + time.toLocaleString() : "");
+  card.appendChild(top);
+
+  function addTeam(name, score) {
+    const row = document.createElement("div");
+    row.className = "teamrow";
+
+    const team = document.createElement("span");
+    team.textContent = safeText(name);
+
+    const points = document.createElement("span");
+    points.className = "score";
+    points.textContent = score === null || score === undefined
+      ? "—" : safeText(score, "—");
+
+    row.append(team, points);
+    card.appendChild(row);
+  }
+
+  addTeam(match.home, match.home_score);
+  addTeam(match.away, match.away_score);
+  return card;
+}
+
+async function loadScores() {
+  const sport = sportSelect.value;
+  refreshBtn.disabled = true;
+  matchesEl.replaceChildren();
+  messageEl.textContent = "Loading " + sport + " scores...";
+
+  try {
+    const url = "https://sportscore.com/api/widget/matches/?sport="
+      + encodeURIComponent(sport) + "&limit=20&src=live-games-today";
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("API returned HTTP " + response.status);
+
+    const data = await response.json();
+    if (!Array.isArray(data.matches)) {
+      throw new Error("Unexpected response format");
+    }
+
+    if (data.matches.length === 0) {
+      messageEl.textContent =
+        "No matches are available right now. Try refreshing later.";
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    data.matches.forEach(match => fragment.appendChild(makeMatch(match)));
+    matchesEl.appendChild(fragment);
+    messageEl.textContent = "Showing " + data.matches.length +
+      " matches · Last checked: " + new Date().toLocaleTimeString();
+  } catch (error) {
+    messageEl.textContent =
+      "Could not load scores. Check your internet connection and try again.";
+    console.error("Scores API error:", error);
+  } finally {
+    refreshBtn.disabled = false;
+  }
+}
+
+refreshBtn.addEventListener("click", loadScores);
+sportSelect.addEventListener("change", loadScores);
+loadScores();
+setInterval(loadScores, 60000);
+</script>
 </body>
 </html>
