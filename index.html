@@ -58,6 +58,68 @@
 </div>
 </section>
 <p class="muted"><small>Notice: Match listings on this demo website are examples, not verified live fixtures or scores.</small></p>
+
+<section class="card" id="live-streams">
+  <h2>🔴 Watch Live Games</h2>
+  <p class="muted">Choose a sport and watch through official streaming links.</p>
+
+  <div class="stream-filters">
+    <button class="btn" onclick="filterStreams('all')">All Sports</button>
+    <button class="btn" onclick="filterStreams('football')">Football</button>
+    <button class="btn" onclick="filterStreams('cricket')">Cricket</button>
+    <button class="btn" onclick="filterStreams('basketball')">Basketball</button>
+    <button class="btn" onclick="filterStreams('other')">Other Sports</button>
+  </div>
+
+  <div class="grid" id="stream-list"></div>
+</section>
+
+<script>
+const liveStreams = [
+  {
+    name: "Official Football Live",
+    sport: "football",
+    url: "https://www.fifa.com/"
+  },
+  {
+    name: "Official Cricket Live",
+    sport: "cricket",
+    url: "https://www.icc-cricket.com/"
+  },
+  {
+    name: "Official Basketball",
+    sport: "basketball",
+    url: "https://www.nba.com/"
+  },
+  {
+    name: "More Sports",
+    sport: "other",
+    url: "https://olympics.com/"
+  }
+];
+
+function filterStreams(sport) {
+  const list = document.getElementById("stream-list");
+  const items = liveStreams.filter(item =>
+    sport === "all" || item.sport === sport
+  );
+
+  list.innerHTML = items.map(item => `
+    <div class="card">
+      <h3>🏟️ ${item.name}</h3>
+      <p class="muted">
+        Visit the official website to find available live coverage.
+      </p>
+      <a class="btn" href="${item.url}"
+         target="_blank" rel="noopener noreferrer">
+        Visit Official Site ↗
+      </a>
+    </div>
+  `).join("");
+}
+
+filterStreams("all");
+</script>
 </main>
 <footer>© 2026 Live Games Today · Sports information hub</footer>
 </body>
