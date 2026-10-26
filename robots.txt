@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://bxdevil55-coder.github.io/live-games-today/sitemap.xmlUser-agent: *
+Allow: /
+
 Sitemap: https://bxdevil55-coder.github.io/live-games-today/sitemap.xml
