@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://bxdevil55-coder.github.io/live-games-today/sitemap.xml
+# Live Games Today sitemap configuration
