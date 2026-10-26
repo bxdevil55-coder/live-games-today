@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Games Today</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#080b14;color:white;
+ font-family:Arial,sans-serif
+}
+header{
+ padding:22px 15px;text-align:center;
+ background:#101526;border-bottom:2px solid #00ffd5;
+ box-shadow:0 0 18px #00ffd533
+}
+h1{color:#00ffd5;margin:0;font-size:28px}
+header p{color:#aab5d0;margin-bottom:0}
+nav{display:flex;justify-content:center;gap:10px;padding:15px}
+button{
+ background:#161e31;color:#00ffd5;
+ border:1px solid #00ffd5;border-radius:20px;
+ padding:10px 15px;cursor:pointer
+}
+main{max-width:650px;margin:auto;padding:12px}
+h2{color:#00ffd5}
+.match{
+ background:#111827;border:1px solid #26344d;
+ border-radius:14px;padding:18px;margin:14px 0;
+ box-shadow:0 0 12px #00ffd511
+}
+.teams{display:flex;justify-content:space-between;
+ align-items:center;font-size:17px;font-weight:bold}
+.time{color:#ff4d8d;font-size:13px}
+.watch{
+ display:inline-block;margin-top:14px;
+ padding:10px 15px;border-radius:8px;
+ background:#00ffd5;color:#071018;
+ text-decoration:none;font-weight:bold
+}
+footer{text-align:center;color:#8b96ad;padding:25px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ LIVE GAMES TODAY</h1>
+<p>Your Sports • Your Passion • Your Game</p>
+</header>
+
+<nav>
+<button onclick="filterGames('all')">All Games</button>
+<button onclick="filterGames('football')">⚽ Football</button>
+<button onclick="filterGames('cricket')">🏏 Cricket</button>
+</nav>
+
+<main>
+<h2>🔥 Today's Games</h2>
+<p style="color:#9ba8c7">Match schedules and official viewing links.</p>
+
+<div class="match" data-sport="football">
+<div class="time">⚽ FOOTBALL</div>
+<div class="teams">
+<span>Team A</span><span>VS</span><span>Team B</span>
+</div>
+<p>Match time: Check official schedule</p>
+<a class="watch" href="https://www.fifa.com/" target="_blank" rel="noopener">Official Updates ↗</a>
+</div>
+
+<div class="match" data-sport="cricket">
+<div class="time">🏏 CRICKET</div>
+<div class="teams">
+<span>Team A</span><span>VS</span><span>Team B</span>
+</div>
+<p>Match time: Check official schedule</p>
+<a class="watch" href="https://www.icc-cricket.com/" target="_blank" rel="noopener">Official Updates ↗</a>
+</div>
+
+<div class="match">
+<div class="time">📺 WATCH SPORTS</div>
+<h3>Find Official Live Coverage</h3>
+<p>Check licensed broadcasters for live matches in your region.</p>
+<a class="watch" href="https://www.fifa.com/" target="_blank" rel="noopener">Explore Sports ↗</a>
+</div>
+</main>
+
+<footer>
+© 2026 Live Games Today<br>
+Made with ⚡ for sports fans
+</footer>
+
+<script>
+function filterGames(sport){
+ document.querySelectorAll('.match[data-sport]').forEach(card=>{
+ card.classList.toggle('hidden',
+ sport!=='all' && card.dataset.sport!==sport);
+ });
+}
+</script>
+</body>
+</html>
