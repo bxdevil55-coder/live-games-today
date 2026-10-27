@@ -152,35 +152,105 @@ function safeText(value, fallback = "TBD") {
   return typeof value === "string" || typeof value === "number"
     ? String(value) : fallback;
 }
-
 function makeMatch(match) {
   const card = document.createElement("article");
   card.className = "match";
 
+  // Match status and time
   const top = document.createElement("div");
   top.className = "match-top";
 
-  const status = safeText(match.status_text || match.status, "Status unavailable");
-  const time = match.time ? new Date(match.time) : null;
-  const validTime = time && !Number.isNaN(time.getTime());
+  const status = safeText(
+    match.status_text || match.status,
+    "Status unavailable"
+  );
 
-  top.textContent = status + (validTime ? " · " + time.toLocaleString() : "");
+  const statusBadge = document.createElement("span");
+  statusBadge.textContent = status;
+  statusBadge.style.fontWeight = "800";
+
+  const normalizedStatus = status.toLowerCase();
+  if (
+    normalizedStatus.includes("live") ||
+    normalizedStatus.includes("half") ||
+    normalizedStatus.includes("quarter") ||
+    normalizedStatus.includes("in progress")
+  ) {
+    statusBadge.style.color = "#00f5d4";
+  } else if (normalizedStatus.includes("finished")) {
+    statusBadge.style.color = "#a5b0c5";
+  } else {
+    statusBadge.style.color = "#facc15";
+  }
+
+  top.appendChild(statusBadge);
+
+  const time = match.time ? new Date(match.time) : null;
+  if (time && !Number.isNaN(time.getTime())) {
+    const timeLabel = document.createElement("span");
+    timeLabel.textContent = time.toLocaleString();
+    top.appendChild(timeLabel);
+  }
+
   card.appendChild(top);
 
-  function addTeam(name, score) {
+  // Competition or league name
+  if (match.competition) {
+    const league = document.createElement("div");
+    league.textContent = "🏆 " + safeText(match.competition);
+    league.style.color = "#a5b0c5";
+    league.style.fontSize = "13px";
+    league.style.marginBottom = "12px";
+    card.appendChild(league);
+  }
+
+  // Team row with optional logo and score
+  function addTeam(name, logo, score) {
     const row = document.createElement("div");
     row.className = "teamrow";
 
+    const teamInfo = document.createElement("div");
+    teamInfo.style.display = "flex";
+    teamInfo.style.alignItems = "center";
+    teamInfo.style.gap = "10px";
+    teamInfo.style.minWidth = "0";
+    teamInfo.style.flex = "1";
+
+    if (typeof logo === "string" && /^https:\/\//i.test(logo)) {
+      const img = document.createElement("img");
+      img.src = logo;
+      img.alt = "";
+      img.width = 28;
+      img.height = 28;
+      img.loading = "lazy";
+      img.style.objectFit = "contain";
+      img.style.flexShrink = "0";
+      img.onerror = () => img.remove();
+      teamInfo.appendChild(img);
+    }
+
     const team = document.createElement("span");
     team.textContent = safeText(name);
+    team.style.overflowWrap = "anywhere";
+    teamInfo.appendChild(team);
 
     const points = document.createElement("span");
     points.className = "score";
-    points.textContent = score === null || score === undefined
-      ? "—" : safeText(score, "—");
+    points.textContent =
+      score === null || score === undefined || score === ""
+        ? "—"
+        : safeText(score, "—");
 
-    row.append(team, points);
+    row.append(teamInfo, points);
     card.appendChild(row);
+  }
+
+  addTeam(match.home, match.home_logo, match.home_score);
+  addTeam(match.away, match.away_logo, match.away_score);
+
+  return card;
+}
+
   }
 
   addTeam(match.home, match.home_score);
