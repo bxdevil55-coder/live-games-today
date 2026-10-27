@@ -252,7 +252,68 @@
   outline: 2px solid #ffffff;
   outline-offset: 3px;
 }
+/* LGT Premium Hero Section */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 65px 28px;
+  border: 1px solid rgba(0, 234, 255, 0.35);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at top right, rgba(0, 234, 255, 0.16), transparent 55%),
+    linear-gradient(135deg, #101a32, #080d1b 70%);
+  box-shadow: 0 0 28px rgba(0, 234, 255, 0.08);
+}
 
+.hero .eyebrow {
+  color: #00eaff;
+  font-weight: 800;
+  letter-spacing: 3px;
+  font-size: 12px;
+}
+
+.hero h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.08;
+  font-weight: 900;
+  margin: 18px 0;
+  letter-spacing: -1.5px;
+}
+
+.hero h1 span {
+  color: #00eaff;
+  text-shadow: 0 0 18px rgba(0, 234, 255, 0.3);
+}
+
+.hero > p:not(.eyebrow) {
+  max-width: 560px;
+  color: #c2cde0;
+  line-height: 1.8;
+}
+
+.hero .btn {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 13px 22px;
+  border-radius: 10px;
+  background: #00d9f5;
+  color: #06101c;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 0 18px rgba(0, 217, 245, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px rgba(0, 217, 245, 0.4);
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 42px 20px;
+  }
+}
 
   </style>
 </head>
