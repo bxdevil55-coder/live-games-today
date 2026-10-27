@@ -100,6 +100,38 @@ flex-shrink: 0;
 width: 100%;
 }
 }
+  
+/* Search and status filter */
+.search-box,
+.filter-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #35425a;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  font-size: 16px;
+}
+
+.search-box:focus,
+.filter-select:focus {
+  outline: 2px solid #00f5d4;
+}
+
+.filter-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+@media (max-width: 600px) {
+  .filter-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>
 </head>
 <body>
