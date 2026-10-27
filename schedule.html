@@ -23,6 +23,83 @@ select, .refresh {
 #message { color:#a5b0c5; padding:12px 0; }
 .attribution { margin-top:24px; font-size:13px; }
 .attribution a { color:#00f5d4; }
+  /* Extra styling for match cards */
+.match {
+background: linear-gradient(135deg, #111827, #172338);
+border: 1px solid #00f5d4;
+border-radius: 16px;
+padding: 18px;
+margin-bottom: 16px;
+box-shadow: 0 6px 20px rgba(0, 245, 212, 0.08);
+}
+
+.match-top {
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
+gap: 8px;
+color: #00f5d4;
+font-size: 13px;
+margin-bottom: 14px;
+text-transform: uppercase;
+letter-spacing: 0.4px;
+}
+
+.teamrow {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 12px;
+padding: 10px 0;
+font-weight: 700;
+border-bottom: 1px solid #273248;
+}
+
+.teamrow:last-child {
+border-bottom: none;
+}
+
+.score {
+color: #00f5d4;
+font-size: 23px;
+font-weight: 800;
+}
+
+.refresh {
+cursor: pointer;
+transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.refresh:hover {
+transform: translateY(-2px);
+opacity: 0.9;
+}
+
+.refresh:disabled {
+opacity: 0.6;
+cursor: wait;
+}
+
+@media (max-width: 600px) {
+.match {
+padding: 14px;
+}
+
+.teamrow {
+font-size: 14px;
+overflow-wrap: anywhere;
+}
+
+.score {
+font-size: 20px;
+flex-shrink: 0;
+}
+
+.controls select,
+.controls .refresh {
+width: 100%;
+}
+}
 </style>
 </head>
 <body>
