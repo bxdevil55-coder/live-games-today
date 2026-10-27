@@ -196,60 +196,91 @@ const sportSelect = document.getElementById("sport");
 const matchesEl = document.getElementById("matches");
 const messageEl = document.getElementById("message");
 const refreshBtn = document.getElementById("refresh");
+const searchEl = document.getElementById("search");
+const statusFilter = document.getElementById("statusFilter");
+
+let allMatches = [];
+let lastUpdated = "";
+let requestId = 0;
 
 function safeText(value, fallback = "TBD") {
   return typeof value === "string" || typeof value === "number"
     ? String(value) : fallback;
 }
 
+function getCategory(match) {
+  const raw = safeText(match.status, "").toLowerCase();
+  const text = (
+    raw + " " + safeText(match.status_text, "")
+  ).toLowerCase();
+
+  if (
+    ["finished", "complete", "completed", "ft", "full_time"].includes(raw) ||
+    text.includes("finished") ||
+    text.includes("full time") ||
+    text.includes("full-time") ||
+    text.includes("ended")
+  ) return "finished";
+
+  if (
+    ["live", "in_progress", "in-progress", "halftime",
+     "half_time", "quarter", "1h", "2h"].includes(raw) ||
+    text.includes("live") ||
+    text.includes("in progress") ||
+    text.includes("in-progress") ||
+    text.includes("half-time") ||
+    text.includes("halftime") ||
+    text.includes("1st half") ||
+    text.includes("2nd half") ||
+    text.includes("quarter") ||
+    text.includes("1st innings") ||
+    text.includes("innings break")
+  ) return "live";
+
+  if (
+    ["upcoming", "not_started", "scheduled", "delayed",
+     "postponed", "ns"].includes(raw) ||
+    text.includes("scheduled") ||
+    text.includes("not started") ||
+    text.includes("upcoming") ||
+    text.includes("delayed") ||
+    text.includes("postponed") ||
+    text.includes("fixture")
+  ) return "upcoming";
+
+  return "other";
+}
+
 function makeMatch(match) {
   const card = document.createElement("article");
   card.className = "match";
 
-  // Match status and time
   const top = document.createElement("div");
   top.className = "match-top";
 
-  const status = safeText(
-    match.status_text || match.status,
-    "Status unavailable"
-  );
-
+  const category = getCategory(match);
   const statusBadge = document.createElement("span");
-  statusBadge.textContent = status;
+  statusBadge.textContent = safeText(
+    match.status_text || match.status, "Status unavailable"
+  );
   statusBadge.style.fontWeight = "800";
   statusBadge.style.padding = "4px 8px";
   statusBadge.style.borderRadius = "6px";
   statusBadge.style.background = "#1e293b";
-
-  const normalizedStatus = status.toLowerCase();
-
-  if (
-    normalizedStatus.includes("live") ||
-    normalizedStatus.includes("half") ||
-    normalizedStatus.includes("quarter") ||
-    normalizedStatus.includes("in progress")
-  ) {
-    statusBadge.style.color = "#00f5d4";
-  } else if (normalizedStatus.includes("finished")) {
-    statusBadge.style.color = "#a5b0c5";
-  } else {
-    statusBadge.style.color = "#facc15";
-  }
+  statusBadge.style.color =
+    category === "live" ? "#00f5d4" :
+    category === "finished" ? "#a5b0c5" : "#facc15";
 
   top.appendChild(statusBadge);
 
   const time = match.time ? new Date(match.time) : null;
-
   if (time && !Number.isNaN(time.getTime())) {
     const timeLabel = document.createElement("span");
     timeLabel.textContent = time.toLocaleString();
     top.appendChild(timeLabel);
   }
-
   card.appendChild(top);
 
-  // Competition or league name
   if (match.competition) {
     const league = document.createElement("div");
     league.textContent = "🏆 " + safeText(match.competition);
@@ -259,17 +290,16 @@ function makeMatch(match) {
     card.appendChild(league);
   }
 
-  // Team rows, logos, and scores
   function addTeam(name, logo, score) {
     const row = document.createElement("div");
     row.className = "teamrow";
 
-    const teamInfo = document.createElement("div");
-    teamInfo.style.display = "flex";
-    teamInfo.style.alignItems = "center";
-    teamInfo.style.gap = "10px";
-    teamInfo.style.minWidth = "0";
-    teamInfo.style.flex = "1";
+    const info = document.createElement("div");
+    info.style.display = "flex";
+    info.style.alignItems = "center";
+    info.style.gap = "10px";
+    info.style.minWidth = "0";
+    info.style.flex = "1";
 
     if (typeof logo === "string" && /^https:\/\//i.test(logo)) {
       const img = document.createElement("img");
@@ -281,72 +311,108 @@ function makeMatch(match) {
       img.style.objectFit = "contain";
       img.style.flexShrink = "0";
       img.onerror = () => img.remove();
-      teamInfo.appendChild(img);
+      info.appendChild(img);
     }
 
     const team = document.createElement("span");
     team.textContent = safeText(name);
     team.style.overflowWrap = "anywhere";
-    teamInfo.appendChild(team);
+    info.appendChild(team);
 
     const points = document.createElement("span");
     points.className = "score";
     points.textContent =
       score === null || score === undefined || score === ""
-        ? "—"
-        : safeText(score, "—");
+        ? "—" : safeText(score, "—");
 
-    row.append(teamInfo, points);
+    row.append(info, points);
     card.appendChild(row);
   }
 
   addTeam(match.home, match.home_logo, match.home_score);
   addTeam(match.away, match.away_logo, match.away_score);
-
   return card;
 }
 
+function renderMatches() {
+  const query = searchEl.value.trim().toLowerCase();
+  const selected = statusFilter.value;
+
+  const filtered = allMatches.filter(match => {
+    const searchable = [
+      match.home, match.away, match.competition
+    ].map(value => safeText(value, "")).join(" ").toLowerCase();
+
+    const searchMatches = searchable.includes(query);
+    const category = getCategory(match);
+    const statusMatches =
+      selected === "all" ||
+      category === selected;
+
+    return searchMatches && statusMatches;
+  });
+
+  matchesEl.replaceChildren();
+
+  if (filtered.length === 0) {
+    messageEl.textContent = allMatches.length
+      ? "No matches match your search or filter."
+      : "No matches available right now. Try refreshing later.";
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  filtered.forEach(match => fragment.appendChild(makeMatch(match)));
+  matchesEl.appendChild(fragment);
+
+  messageEl.textContent =
+    "Showing " + filtered.length + " of " + allMatches.length +
+    " matches · Last checked: " + lastUpdated;
+}
 
 async function loadScores() {
+  const thisRequest = ++requestId;
   const sport = sportSelect.value;
+
   refreshBtn.disabled = true;
-  matchesEl.replaceChildren();
   messageEl.textContent = "Loading " + sport + " scores...";
 
   try {
-    const url = "https://sportscore.com/api/widget/matches/?sport="
-      + encodeURIComponent(sport) + "&limit=20&src=live-games-today";
+    const url =
+      "https://sportscore.com/api/widget/matches/?sport=" +
+      encodeURIComponent(sport) +
+      "&limit=20&src=live-games-today";
 
     const response = await fetch(url);
-    if (!response.ok) throw new Error("API returned HTTP " + response.status);
+    if (!response.ok) {
+      throw new Error("API returned HTTP " + response.status);
+    }
 
     const data = await response.json();
     if (!Array.isArray(data.matches)) {
       throw new Error("Unexpected response format");
     }
 
-    if (data.matches.length === 0) {
-      messageEl.textContent =
-        "No matches are available right now. Try refreshing later.";
-      return;
-    }
+    if (thisRequest !== requestId) return;
 
-    const fragment = document.createDocumentFragment();
-    data.matches.forEach(match => fragment.appendChild(makeMatch(match)));
-    matchesEl.appendChild(fragment);
-    messageEl.textContent = "Showing " + data.matches.length +
-      " matches · Last checked: " + new Date().toLocaleTimeString();
+    allMatches = data.matches;
+    lastUpdated = new Date().toLocaleTimeString();
+    renderMatches();
   } catch (error) {
+    if (thisRequest !== requestId) return;
     messageEl.textContent =
-      "Could not load scores. Check your internet connection and try again.";
+      "Could not load scores. Check your internet and try again.";
     console.error("Scores API error:", error);
   } finally {
-    refreshBtn.disabled = false;
+    if (thisRequest === requestId) refreshBtn.disabled = false;
   }
 }
 
 refreshBtn.addEventListener("click", loadScores);
 sportSelect.addEventListener("change", loadScores);
+searchEl.addEventListener("input", renderMatches);
+statusFilter.addEventListener("change", renderMatches);
+
 loadScores();
 setInterval(loadScores, 60000);
 </script>
