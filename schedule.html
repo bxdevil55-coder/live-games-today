@@ -152,6 +152,7 @@ function safeText(value, fallback = "TBD") {
   return typeof value === "string" || typeof value === "number"
     ? String(value) : fallback;
 }
+
 function makeMatch(match) {
   const card = document.createElement("article");
   card.className = "match";
@@ -168,8 +169,12 @@ function makeMatch(match) {
   const statusBadge = document.createElement("span");
   statusBadge.textContent = status;
   statusBadge.style.fontWeight = "800";
+  statusBadge.style.padding = "4px 8px";
+  statusBadge.style.borderRadius = "6px";
+  statusBadge.style.background = "#1e293b";
 
   const normalizedStatus = status.toLowerCase();
+
   if (
     normalizedStatus.includes("live") ||
     normalizedStatus.includes("half") ||
@@ -186,6 +191,7 @@ function makeMatch(match) {
   top.appendChild(statusBadge);
 
   const time = match.time ? new Date(match.time) : null;
+
   if (time && !Number.isNaN(time.getTime())) {
     const timeLabel = document.createElement("span");
     timeLabel.textContent = time.toLocaleString();
@@ -204,7 +210,7 @@ function makeMatch(match) {
     card.appendChild(league);
   }
 
-  // Team row with optional logo and score
+  // Team rows, logos, and scores
   function addTeam(name, logo, score) {
     const row = document.createElement("div");
     row.className = "teamrow";
@@ -251,12 +257,6 @@ function makeMatch(match) {
   return card;
 }
 
-  }
-
-  addTeam(match.home, match.home_score);
-  addTeam(match.away, match.away_score);
-  return card;
-}
 
 async function loadScores() {
   const sport = sportSelect.value;
