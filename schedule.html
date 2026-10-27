@@ -162,6 +162,23 @@ width: 100%;
 <button class="refresh" id="refresh">Refresh scores</button>
 </div>
 
+<div class="filter-controls">
+  <input
+    type="search"
+    id="search"
+    class="search-box"
+    placeholder="🔍 Search team or league..."
+    aria-label="Search teams or leagues"
+  >
+
+  <select id="statusFilter" class="filter-select"
+          aria-label="Filter matches by status">
+    <option value="all">All matches</option>
+    <option value="live">🔴 Live</option>
+    <option value="upcoming">🟡 Upcoming</option>
+    <option value="finished">⚪ Finished</option>
+  </select>
+</div>
 <p id="message" role="status">Loading scores...</p>
 <section id="matches" aria-live="polite"></section>
 
