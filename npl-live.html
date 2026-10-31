@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d1b">
+  <title>NPL Live Score | Live Games Today</title>
+  <meta name="description" content="NPL live cricket scores, scorecards, fixtures and official match viewing links.">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #080d1b;
+      color: #f4f7ff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 20px 16px;
+      background: #101a30;
+      border-bottom: 1px solid #263a59;
+    }
+    header a { color: #9be7ff; text-decoration: none; }
+    main { max-width: 900px; margin: auto; padding: 18px; }
+    .hero, .panel {
+      background: #111b30;
+      border: 1px solid #293c5a;
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    h1 { color: #61e8ff; font-size: 27px; }
+    h2 { font-size: 20px; }
+    .muted { color: #b5c3d9; line-height: 1.6; }
+    .buttons { display: grid; gap: 12px; margin-top: 18px; }
+    .btn {
+      display: block;
+      padding: 14px;
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+      color: #07101c;
+      background: #61e8ff;
+    }
+    .btn.secondary { background: #f9b84a; }
+    .btn.outline {
+      color: #f4f7ff;
+      background: transparent;
+      border: 1px solid #61e8ff;
+    }
+    .widget {
+      background: #fff;
+      color: #111;
+      border-radius: 10px;
+      overflow: hidden;
+      min-height: 150px;
+    }
+    .widget iframe {
+      display: block;
+      width: 100%;
+      border: 0;
+    }
+    footer {
+      text-align: center;
+      color: #9baec9;
+      padding: 25px 12px;
+    }
+  </style>
+  <link rel="canonical" href="https://bxdevil55-coder.github.io/live-games-today/npl-live.html">
+</head>
+<body>
+  <header>
+    <a href="index.html">← Live Games Today Home</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>🏏 NPL LIVE CENTER</h1>
+      <p class="muted">
+        Nepal Premier League 2026<br>
+        Live Scores · Scorecards · Match Updates
+      </p>
+      <div class="buttons">
+        <a class="btn" href="#live-score">📊 View Live Score</a>
+        <a class="btn secondary"
+           href="https://nepalpremierleague.org/fixtures"
+           target="_blank" rel="noopener">
+          🏏 Official Fixtures & Scorecards
+        </a>
+        <a class="btn outline"
+           href="https://nepalpremierleague.org/"
+           target="_blank" rel="noopener">
+          ▶ Official NPL Website / Watch Information
+        </a>
+      </div>
+    </section>
+
+    <section class="panel" id="live-score">
+      <h2>🔴 NPL Live Score</h2>
+      <p class="muted">
+        Live score widget provided by Kantipur Max HD.
+        Scores update during matches when the provider supplies data.
+      </p>
+      <div class="widget">
+        <div data-npl-widget="live-score"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>📋 Match Scorecard</h2>
+      <p class="muted">
+        Open the official NPL fixtures page and select the match's
+        Scorecard option to view batting, bowling and match results.
+      </p>
+      <div class="buttons">
+        <a class="btn secondary"
+           href="https://nepalpremierleague.org/fixtures"
+           target="_blank" rel="noopener">
+          Open Official Scorecard
+        </a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>📺 Watch NPL Officially</h2>
+      <p class="muted">
+        Select the available official viewing option. A subscription
+        or regional access may be required. Video is not hosted by
+        Live Games Today.
+      </p>
+      <a class="btn"
+         href="https://nepalpremierleague.org/"
+         target="_blank" rel="noopener">
+        Find Official Watch Live
+      </a>
+    </section>
+
+    <footer>
+      <p>© 2026 Live Games Today</p>
+      <p>Scores and match information are provided by external sources.</p>
+    </footer>
+  </main>
+
+  <script async src="https://kantipurmax.com/embed.js"></script>
+</body>
+</html>
