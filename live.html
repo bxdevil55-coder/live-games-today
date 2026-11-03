@@ -86,8 +86,127 @@ bhanera broadcaster ko official listing check gara.
 Check Official Broadcasters
 </a>
 </section>
+
+<section class="panel" id="automatic-live-scores">
+  <h2>⚡ Automatic Live Scores</h2>
+  <p class="muted">Cricket & Football · Auto refresh every 60 seconds</p>
+
+  <h3>🏏 Cricket Matches</h3>
+  <div id="cricket-scores" class="score-list">Loading Cricket...</div>
+
+  <h3>⚽ Football Matches</h3>
+  <div id="football-scores" class="score-list">Loading Football...</div>
+
+  <p class="muted" id="score-updated">Loading scores...</p>
+  <p class="muted">
+    Data provided by
+    <a href="https://sportscore.com/" target="_blank"
+       rel="noopener noreferrer">SportScore</a>
+  </p>
+</section>
+
 </main>
 
 <footer>© 2026 Live Games Today</footer>
+<style>
+.score-list { display:grid; gap:12px; margin:12px 0 22px; }
+.score-card {
+  background:#080f1d; border:1px solid #263248;
+  border-radius:10px; padding:14px;
+}
+.score-card p { margin:5px 0; }
+.score-status { color:#00f5d4; font-weight:bold; }
+.score-teams { font-weight:bold; }
+.score-error { color:#ff8b8b; }
+</style>
+
+<script>
+const scoreEndpoints = {
+  cricket: "https://sportscore.com/api/widget/matches/?sport=cricket&limit=20",
+  football: "https://sportscore.com/api/widget/matches/?sport=football&limit=20"
+};
+
+async function loadSportScores(sport) {
+  const container = document.getElementById(sport + "-scores");
+  container.textContent = "Loading...";
+
+  try {
+    const response = await fetch(scoreEndpoints[sport]);
+    if (!response.ok) throw new Error("HTTP " + response.status);
+
+    const data = await response.json();
+    container.replaceChildren();
+
+    if (!Array.isArray(data.matches) || data.matches.length === 0) {
+      container.textContent = "No matches available right now.";
+      return;
+    }
+
+    const matches = [...data.matches];
+
+    if (sport === "cricket") {
+      matches.sort((a, b) => {
+        const aNpl = /NPL|Nepal Premier League/i.test(a.competition || "");
+        const bNpl = /NPL|Nepal Premier League/i.test(b.competition || "");
+        return Number(bNpl) - Number(aNpl);
+      });
+    }
+
+    matches.slice(0, 5).forEach(match => {
+      const card = document.createElement("div");
+      card.className = "score-card";
+
+      const competition = document.createElement("p");
+      competition.className = "muted";
+      competition.textContent = match.competition || "Sports Match";
+
+      const teams = document.createElement("p");
+      teams.className = "score-teams";
+      teams.textContent =
+        (match.home || "Team A") + "  " +
+        (match.home_score ?? "-") + " : " +
+        (match.away_score ?? "-") + "  " +
+        (match.away || "Team B");
+
+      const status = document.createElement("p");
+      status.className = "score-status";
+      const rawStatus = match.status_text || match.status || "";
+      status.textContent =
+        /abnormal/i.test(rawStatus) || !rawStatus
+          ? "Status unavailable"
+          : rawStatus;
+
+      const time = document.createElement("p");
+      time.className = "muted";
+      if (match.time) {
+        const date = new Date(match.time);
+        time.textContent = isNaN(date) ? "" :
+          date.toLocaleString("en-NP", {dateStyle:"medium", timeStyle:"short"});
+      }
+
+      card.append(competition, teams, status, time);
+      container.appendChild(card);
+    });
+  } catch (error) {
+    container.textContent = "Scores temporarily unavailable. Please try again.";
+    container.classList.add("score-error");
+    console.error(sport + " score error:", error);
+  }
+}
+
+async function refreshAllScores() {
+  await Promise.all([
+    loadSportScores("cricket"),
+    loadSportScores("football")
+  ]);
+
+  document.getElementById("score-updated").textContent =
+    "Last checked: " + new Date().toLocaleTimeString();
+}
+
+refreshAllScores();
+setInterval(refreshAllScores, 60000);
+</script>
+
 </body>
 </html>
