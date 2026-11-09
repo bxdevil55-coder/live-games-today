@@ -97,3 +97,10 @@ small { color: var(--muted); }
   nav { gap: 4px; }
   nav a { padding: 7px; font-size: 14px; }
 }
+
+/* Header site name */
+.site-name {
+  color: var(--cyan);
+  font-size: 24px;
+  font-weight: bold;
+}
