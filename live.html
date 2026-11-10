@@ -231,10 +231,21 @@ async function loadSportScores(sport) {
       const status = document.createElement("p");
       status.className = "score-status";
       const rawStatus = match.status_text || match.status || "";
-      status.textContent =
-        /abnormal/i.test(rawStatus) || !rawStatus
-          ? "Status unavailable"
-          : rawStatus;
+      const cleanStatus = rawStatus.trim();
+
+      if (!cleanStatus || /abnormal|unavailable/i.test(cleanStatus)) {
+        status.textContent = "Match status unavailable";
+      } else if (/1st innings|2nd innings/i.test(cleanStatus)) {
+        status.textContent = "Innings in progress";
+      } else if (/cut in half/i.test(cleanStatus)) {
+        status.textContent = "Match status unclear";
+      } else if (/finished|complete|ended/i.test(cleanStatus)) {
+        status.textContent = "Finished";
+      } else if (/not started|scheduled|upcoming/i.test(cleanStatus)) {
+        status.textContent = "Upcoming";
+      } else {
+        status.textContent = cleanStatus;
+      }
 
       const time = document.createElement("p");
       time.className = "muted";
